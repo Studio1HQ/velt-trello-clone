@@ -277,7 +277,7 @@ export default function Home() {
           onUserSwitch={handleUserSwitch}
           boardTitle={boardData.title}
         />
-        <main className="p-6">
+        <main className="p-3 sm:p-6">
           <DndContext sensors={sensors} onDragStart={handleDragStart} onDragEnd={handleDragEnd}>
             <Board
               board={boardData}
@@ -289,7 +289,7 @@ export default function Home() {
             />
             <DragOverlay>
               {activeCard ? (
-                <div className="w-80 opacity-50">
+                <div className="w-72 sm:w-80 opacity-50">
                   <Card className="cursor-grabbing shadow-lg bg-card">
                     <CardContent className="p-3">
                       <h4 className="text-sm font-medium text-foreground">{activeCard.title}</h4>

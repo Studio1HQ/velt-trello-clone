@@ -89,3 +89,10 @@
   outline-offset: 2px;
   border-radius: 4px;
 }
+
+/* Custom breakpoint for extra small screens */
+@media (min-width: 475px) {
+  .xs\:flex {
+    display: flex;
+  }
+}

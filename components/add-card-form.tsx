@@ -37,10 +37,10 @@ export function AddCardForm({ listId, onAddCard, onCancel }: AddCardFormProps) {
             className="text-sm"
           />
           <div className="flex gap-2">
-            <Button type="submit" size="sm" disabled={!title.trim()}>
+            <Button type="submit" size="sm" disabled={!title.trim()} className="text-xs sm:text-sm">
               Add card
             </Button>
-            <Button type="button" variant="ghost" size="sm" onClick={onCancel}>
+            <Button type="button" variant="ghost" size="sm" onClick={onCancel} className="text-xs sm:text-sm">
               Cancel
             </Button>
           </div>

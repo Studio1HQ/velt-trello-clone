@@ -176,11 +176,11 @@ function DraggableCard({
           <div className="flex items-center gap-2">
             {creator && (
               <div className="flex items-center gap-1">
-                <span>{creator.name.split(" ")[0]}</span>
+                <span className="truncate max-w-[80px]">{creator.name.split(" ")[0]}</span>
               </div>
             )}
           </div>
-          <div className="flex items-center gap-1">
+          <div className="flex items-center gap-1 flex-shrink-0">
             <Clock className="h-3 w-3" />
             <span>{formatRelativeTime(card.createdAt)}</span>
           </div>
@@ -189,7 +189,7 @@ function DraggableCard({
         {/* Assigned Users */}
         {card.assignedUsers.length > 0 && (
           <div className="flex -space-x-2 mb-3">
-            {card.assignedUsers.map((userId) => {
+            {card.assignedUsers.slice(0, 4).map((userId) => {
               const user = getUserById(userId)
               return user ? (
                 <Avatar key={userId} className="h-6 w-6 border-2 border-background">
@@ -203,11 +203,16 @@ function DraggableCard({
                 </Avatar>
               ) : null
             })}
+            {card.assignedUsers.length > 4 && (
+              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted border-2 border-background text-xs font-medium">
+                +{card.assignedUsers.length - 4}
+              </div>
+            )}
           </div>
         )}
 
         {/* Reactions and Comments */}
-        <div className="flex items-center justify-between">
+        <div className="flex items-center justify-between flex-wrap gap-2">
           {/* Reactions */}
           {card.reactions.length > 0 && (
             <div className="flex flex-wrap gap-1" data-velt-reactions={`card-${card.id}`}>
@@ -226,7 +231,11 @@ function DraggableCard({
 
           {/* Comment Count */}
           {card.commentCount > 0 && (
-            <Badge variant="outline" className="text-xs ml-auto" data-velt-comment-count={`card-${card.id}`}>
+            <Badge
+              variant="outline"
+              className="text-xs ml-auto flex-shrink-0"
+              data-velt-comment-count={`card-${card.id}`}
+            >
               💬 {card.commentCount}
             </Badge>
           )}
@@ -256,13 +265,13 @@ function DroppableList({
   })
 
   return (
-    <div ref={setNodeRef} className="flex-shrink-0 w-80" data-velt-target={`list-${list.id}`}>
+    <div ref={setNodeRef} className="flex-shrink-0 w-72 sm:w-80" data-velt-target={`list-${list.id}`}>
       <Card className="bg-muted/50">
-        <CardContent className="p-4">
+        <CardContent className="p-3 sm:p-4">
           {/* List Header */}
           <div className="flex items-center justify-between mb-4">
             <h3
-              className="font-semibold text-foreground cursor-pointer hover:bg-accent hover:text-accent-foreground px-2 py-1 rounded -mx-2"
+              className="font-semibold text-foreground cursor-pointer hover:bg-accent hover:text-accent-foreground px-2 py-1 rounded -mx-2 text-sm sm:text-base truncate flex-1 mr-2"
               data-velt-target={`list-title-${list.id}`}
               contentEditable
               suppressContentEditableWarning
@@ -271,7 +280,7 @@ function DroppableList({
             </h3>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
-                <Button variant="ghost" size="icon" className="h-8 w-8">
+                <Button variant="ghost" size="icon" className="h-8 w-8 flex-shrink-0">
                   <MoreHorizontal className="h-4 w-4" />
                 </Button>
               </DropdownMenuTrigger>
@@ -303,7 +312,7 @@ function DroppableList({
           ) : (
             <Button
               variant="ghost"
-              className="w-full justify-start text-muted-foreground hover:text-foreground"
+              className="w-full justify-start text-muted-foreground hover:text-foreground text-sm"
               onClick={() => setShowAddCard(true)}
               data-velt-target={`add-card-${list.id}`}
             >
@@ -322,7 +331,7 @@ export function Board({ board, users, onCardClick, onAddCard, onAddList, onDelet
   const [showAddList, setShowAddList] = useState(false)
 
   return (
-    <div className="flex gap-6 overflow-x-auto pb-6" data-velt-target="board-container">
+    <div className="flex gap-4 sm:gap-6 overflow-x-auto pb-6 px-1" data-velt-target="board-container">
       {board.lists.map((list) => (
         <DroppableList
           key={list.id}
@@ -338,15 +347,16 @@ export function Board({ board, users, onCardClick, onAddCard, onAddList, onDelet
       {showAddList ? (
         <AddListForm onAddList={onAddList} onCancel={() => setShowAddList(false)} />
       ) : (
-        <div className="flex-shrink-0 w-80">
+        <div className="flex-shrink-0 w-72 sm:w-80">
           <Button
             variant="ghost"
-            className="w-full h-12 border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 text-muted-foreground hover:text-foreground"
+            className="w-full h-12 border-2 border-dashed border-muted-foreground/25 hover:border-muted-foreground/50 text-muted-foreground hover:text-foreground text-sm"
             onClick={() => setShowAddList(true)}
             data-velt-target="add-list"
           >
             <Plus className="h-4 w-4 mr-2" />
-            Add another list
+            <span className="hidden sm:inline">Add another list</span>
+            <span className="sm:hidden">Add list</span>
           </Button>
         </div>
       )}
