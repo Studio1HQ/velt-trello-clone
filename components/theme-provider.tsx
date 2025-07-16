@@ -33,35 +33,40 @@ export function ThemeProvider({
   ...props
 }: ThemeProviderProps) {
   const [theme, setTheme] = useState<Theme>(defaultTheme)
+  const [mounted, setMounted] = useState(false)
 
   useEffect(() => {
-    const root = window.document.documentElement
+    // On mount - read saved theme first, then set mounted
+    if (typeof window !== "undefined") {
+      const savedTheme = window.localStorage.getItem(storageKey) as Theme | null
+      if (savedTheme) {
+        setTheme(savedTheme)
+      }
+    }
+    setMounted(true)
+  }, [storageKey])
 
+  useEffect(() => {
+    if (!mounted) return
+
+    const root = window.document.documentElement
     root.classList.remove("light", "dark")
 
     if (theme === "system") {
       const systemTheme = window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light"
-
       root.classList.add(systemTheme)
       return
     }
 
     root.classList.add(theme)
-  }, [theme])
+  }, [theme, mounted])
 
   useEffect(() => {
-    // On mount - read saved theme if it exists
-    if (typeof window !== "undefined") {
-      const savedTheme = window.localStorage.getItem(storageKey) as Theme | null
-      if (savedTheme && savedTheme !== theme) {
-        setTheme(savedTheme)
-      }
-    }
-    // Persist whenever theme changes (but only in browser)
-    if (typeof window !== "undefined") {
+    // Persist theme changes to localStorage
+    if (mounted && typeof window !== "undefined") {
       window.localStorage.setItem(storageKey, theme)
     }
-  }, [theme, storageKey])
+  }, [theme, storageKey, mounted])
 
   const value = {
     theme,
@@ -72,6 +77,11 @@ export function ThemeProvider({
       const newTheme = theme === "light" ? "dark" : "light"
       setTheme(newTheme)
     },
+  }
+
+  // Prevent flash by not rendering until mounted
+  if (!mounted) {
+    return null
   }
 
   return (
