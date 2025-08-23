@@ -1,10 +1,13 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Navbar } from "@/components/navbar"
 import { Board } from "@/components/board"
 import { CardDetailModal } from "@/components/card-detail-modal"
 import { ThemeProvider } from "@/components/theme-provider"
+import { VeltAuth } from "@/components/velt-auth"
+import { DynamicVeltComments, DynamicVeltCommentsSidebar } from "@/components/velt-comments-dynamic"
+import { getOrCreateUser, switchUser } from "@/lib/user-manager"
 import {
   DndContext,
   type DragEndEvent,
@@ -154,14 +157,26 @@ const mockComments = [
 export default function Home() {
   const [boardData, setBoardData] = useState(mockBoard)
   const [activeCard, setActiveCard] = useState<BoardCard | null>(null)
-  const [currentUser, setCurrentUser] = useState(mockUsers[0])
+  const [currentUser, setCurrentUser] = useState<any>(null)
   const [selectedCard, setSelectedCard] = useState<string | null>(null)
   const sensors = useSensors(useSensor(PointerSensor, { activationConstraint: { distance: 8 } }))
 
-  const handleUserSwitch = (userId: string) => {
-    const user = mockUsers.find((u) => u.id === userId)
-    if (user) {
-      setCurrentUser(user)
+  // Initialize user on client side only
+  useEffect(() => {
+    const user = getOrCreateUser()
+    setCurrentUser(user)
+  }, [])
+
+  const handleUserSwitch = async () => {
+    const newUser = switchUser()
+    if (newUser) {
+      setCurrentUser(newUser)
+      
+      // Small delay to ensure state is updated
+      await new Promise(resolve => setTimeout(resolve, 50))
+      
+      // Trigger Velt user switch event
+      window.dispatchEvent(new CustomEvent('velt-user-switch'))
     }
   }
 
@@ -231,10 +246,10 @@ export default function Home() {
     const newCard: BoardCard = {
       id: `card-${Date.now()}`,
       title,
-      assignedUsers: [currentUser.id],
+      assignedUsers: [currentUser?.userId || '1'],
       reactions: [],
       commentCount: 0,
-      createdBy: currentUser.id,
+      createdBy: currentUser?.userId || '1',
       createdAt: new Date().toISOString(),
     }
 
@@ -271,9 +286,9 @@ export default function Home() {
   return (
     <ThemeProvider>
       <div className="min-h-screen bg-background">
+        <VeltAuth />
         <Navbar
           currentUser={currentUser}
-          users={mockUsers}
           onUserSwitch={handleUserSwitch}
           boardTitle={boardData.title}
         />
@@ -310,6 +325,10 @@ export default function Home() {
             onClose={handleCloseCardDetail}
           />
         )}
+
+        {/* Velt Comments Components */}
+        <DynamicVeltComments popoverMode={true} />
+        <DynamicVeltCommentsSidebar />
       </div>
     </ThemeProvider>
   )

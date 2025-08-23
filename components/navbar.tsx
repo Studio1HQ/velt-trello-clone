@@ -1,5 +1,5 @@
 "use client"
-import { Moon, Sun, Plus, Users } from "lucide-react"
+import { Moon, Sun, Plus, ChevronDown } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import {
@@ -10,25 +10,25 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useTheme } from "@/components/theme-provider"
-
-interface User {
-  id: string
-  name: string
-  avatar: string
-  email: string
-  online: boolean
-}
+import { DynamicVeltPresence } from "./velt-presence-dynamic"
+import { DynamicVeltSidebarButton } from "./velt-comments-dynamic"
+import { getAvailableUsers } from "@/lib/user-manager"
+import { useEffect, useState } from "react"
 
 interface NavbarProps {
-  currentUser: User
-  users: User[]
-  onUserSwitch: (userId: string) => void
+  currentUser: any
+  onUserSwitch: () => void
   boardTitle: string
 }
 
-export function Navbar({ currentUser, users, onUserSwitch, boardTitle }: NavbarProps) {
+export function Navbar({ currentUser, onUserSwitch, boardTitle }: NavbarProps) {
   const { theme, toggleTheme } = useTheme()
-  const onlineUsers = users.filter((user) => user.online)
+  const [availableUsers, setAvailableUsers] = useState<any[]>([])
+
+  useEffect(() => {
+    const users = getAvailableUsers()
+    setAvailableUsers(users)
+  }, [currentUser])
 
   return (
     <nav className="border-b bg-card/50 backdrop-blur supports-[backdrop-filter]:bg-card/50">
@@ -56,55 +56,14 @@ export function Navbar({ currentUser, users, onUserSwitch, boardTitle }: NavbarP
 
         {/* Right section - Presence, Theme, User */}
         <div className="flex items-center gap-1 sm:gap-4">
-          {/* Online Users Presence - Hidden on very small screens */}
-          <div className="hidden sm:flex items-center gap-2" data-velt-presence="online-users">
-            <Users className="h-4 w-4 text-muted-foreground" />
-            <div className="flex -space-x-2">
-              {onlineUsers.slice(0, 3).map((user) => (
-                <div key={user.id} className="relative">
-                  <Avatar className="h-6 w-6 sm:h-8 sm:w-8 border-2 border-background">
-                    <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
-                    <AvatarFallback className="text-xs">
-                      {user.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="absolute -bottom-0.5 -right-0.5 h-2 w-2 sm:h-3 sm:w-3 rounded-full bg-green-500 border-2 border-background" />
-                </div>
-              ))}
-              {onlineUsers.length > 3 && (
-                <div className="flex h-6 w-6 sm:h-8 sm:w-8 items-center justify-center rounded-full bg-muted border-2 border-background text-xs font-medium">
-                  +{onlineUsers.length - 3}
-                </div>
-              )}
-            </div>
+          {/* Velt Presence Component */}
+          <div className="flex items-center mr-2 min-w-[80px]">
+            <DynamicVeltPresence />
           </div>
 
-          {/* Mobile presence indicator - simplified */}
-          <div className="flex sm:hidden items-center" data-velt-presence="online-users-mobile">
-            <div className="flex -space-x-1">
-              {onlineUsers.slice(0, 2).map((user) => (
-                <div key={user.id} className="relative">
-                  <Avatar className="h-6 w-6 border-2 border-background">
-                    <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
-                    <AvatarFallback className="text-xs">
-                      {user.name
-                        .split(" ")
-                        .map((n) => n[0])
-                        .join("")}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div className="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full bg-green-500 border border-background" />
-                </div>
-              ))}
-              {onlineUsers.length > 2 && (
-                <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted border-2 border-background text-xs font-medium">
-                  +{onlineUsers.length - 2}
-                </div>
-              )}
-            </div>
+          {/* Comments Sidebar */}
+          <div className="hidden sm:flex">
+            <DynamicVeltSidebarButton />
           </div>
 
           {/* Theme Toggle */}
@@ -114,54 +73,93 @@ export function Navbar({ currentUser, users, onUserSwitch, boardTitle }: NavbarP
           </Button>
 
           {/* User Switcher */}
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button
-                variant="ghost"
-                className="relative h-8 w-8 sm:h-9 sm:w-9 rounded-full"
-                data-velt-target="user-switcher"
-              >
-                <Avatar className="h-8 w-8 sm:h-9 sm:w-9">
-                  <AvatarImage src={currentUser.avatar || "/placeholder.svg"} alt={currentUser.name} />
-                  <AvatarFallback className="text-xs">
-                    {currentUser.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
-                  </AvatarFallback>
-                </Avatar>
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent className="w-56" align="end" forceMount>
-              <div className="flex items-center justify-start gap-2 p-2">
-                <div className="flex flex-col space-y-1 leading-none">
-                  <p className="font-medium">{currentUser.name}</p>
-                  <p className="w-[200px] truncate text-sm text-muted-foreground">{currentUser.email}</p>
+          {currentUser && (
+            <DropdownMenu>
+              <DropdownMenuTrigger asChild>
+                <Button
+                  variant="ghost"
+                  className="h-9 px-2 flex items-center space-x-2"
+                  data-velt-target="user-switcher"
+                >
+                  <Avatar className="h-7 w-7 relative">
+                    <AvatarImage src={currentUser.photoUrl || "/placeholder.svg"} alt={currentUser.name} />
+                    <AvatarFallback className="text-xs">
+                      {currentUser.name
+                        .split(" ")
+                        .map((n: string) => n[0])
+                        .join("")}
+                    </AvatarFallback>
+                  </Avatar>
+                  <ChevronDown className="h-4 w-4 hidden sm:block" />
+                </Button>
+              </DropdownMenuTrigger>
+              <DropdownMenuContent align="end" className="w-64">
+                <div className="px-2 py-1.5">
+                  <p className="text-sm font-medium">User Switching</p>
+                  <p className="text-xs text-muted-foreground">Switch between users</p>
                 </div>
-              </div>
-              <DropdownMenuSeparator />
-              {users
-                .filter((user) => user.id !== currentUser.id)
-                .map((user) => (
-                  <DropdownMenuItem key={user.id} onClick={() => onUserSwitch(user.id)} className="gap-2">
-                    <Avatar className="h-6 w-6">
-                      <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
-                      <AvatarFallback className="text-xs">
-                        {user.name
-                          .split(" ")
-                          .map((n) => n[0])
-                          .join("")}
-                      </AvatarFallback>
-                    </Avatar>
-                    <div className="flex flex-col">
-                      <span className="text-sm">{user.name}</span>
-                      <span className="text-xs text-muted-foreground">{user.email}</span>
-                    </div>
-                    {user.online && <div className="ml-auto h-2 w-2 rounded-full bg-green-500" />}
-                  </DropdownMenuItem>
-                ))}
-            </DropdownMenuContent>
-          </DropdownMenu>
+                <DropdownMenuSeparator />
+                
+                {/* Current User */}
+                <div className="px-2 py-1">
+                  <p className="text-xs font-medium text-muted-foreground mb-1">Current User</p>
+                </div>
+                <DropdownMenuItem className="flex items-center space-x-3 p-3">
+                  <Avatar className="h-8 w-8">
+                    <AvatarImage src={currentUser.photoUrl || "/placeholder.svg"} alt={currentUser.name} />
+                    <AvatarFallback className="text-xs">
+                      {currentUser.name
+                        .split(" ")
+                        .map((n: string) => n[0])
+                        .join("")}
+                    </AvatarFallback>
+                  </Avatar>
+                  <div className="flex-1 min-w-0">
+                    <p className="text-sm font-medium truncate">{currentUser.name}</p>
+                    <p className="text-xs text-muted-foreground truncate">{currentUser.email}</p>
+                  </div>
+                  <div className="flex items-center space-x-1">
+                    <div className="h-2 w-2 rounded-full bg-green-500" />
+                    <span className="text-xs text-muted-foreground hidden sm:inline">Active</span>
+                  </div>
+                </DropdownMenuItem>
+
+                <DropdownMenuSeparator />
+                
+                {/* Switch to Another User */}
+                <div className="px-2 py-1">
+                  <p className="text-xs font-medium text-muted-foreground mb-1">Switch User</p>
+                </div>
+                {availableUsers.length > 1 && availableUsers
+                  .filter(user => user.userId !== currentUser.userId)
+                  .map(user => (
+                    <DropdownMenuItem 
+                      key={user.userId}
+                      className="flex items-center space-x-3 p-3 cursor-pointer hover:bg-accent"
+                      onClick={onUserSwitch}
+                    >
+                      <Avatar className="h-8 w-8">
+                        <AvatarImage src={user.photoUrl || "/placeholder.svg"} alt={user.name} />
+                        <AvatarFallback className="text-xs">
+                          {user.name
+                            .split(" ")
+                            .map((n: string) => n[0])
+                            .join("")}
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm font-medium truncate">{user.name}</p>
+                        <p className="text-xs text-muted-foreground truncate">{user.email}</p>
+                      </div>
+                      <div className="flex items-center space-x-1">
+                        <div className="h-2 w-2 rounded-full bg-gray-400" />
+                        <span className="text-xs text-muted-foreground hidden sm:inline">Switch</span>
+                      </div>
+                    </DropdownMenuItem>
+                  ))}
+              </DropdownMenuContent>
+            </DropdownMenu>
+          )}
         </div>
       </div>
     </nav>

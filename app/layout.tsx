@@ -1,9 +1,10 @@
 import type { Metadata } from 'next'
 import './globals.css'
+import { VeltWrapper } from '@/components/velt-wrapper'
 
 export const metadata: Metadata = {
-  title: 'v0 App',
-  description: 'Created with v0',
+  title: 'Trello Clone',
+  description: 'A collaborative Trello board with Velt integration',
   generator: 'v0.dev',
 }
 
@@ -13,8 +14,12 @@ export default function RootLayout({
   children: React.ReactNode
 }>) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" suppressHydrationWarning>
+      <body suppressHydrationWarning>
+        <VeltWrapper>
+          {children}
+        </VeltWrapper>
+      </body>
     </html>
   )
 }
