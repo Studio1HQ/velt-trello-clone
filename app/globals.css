@@ -96,3 +96,59 @@
     display: flex;
   }
 }
+
+/* Velt component theming */
+.velt-comment-dialog {
+  background: var(--velt-comment-background, hsl(var(--card))) !important;
+  color: var(--velt-comment-text, hsl(var(--card-foreground))) !important;
+  border: 1px solid var(--velt-comment-border, hsl(var(--border))) !important;
+  border-radius: calc(var(--radius) - 2px) !important;
+}
+
+.velt-comment-composer {
+  background: var(--velt-comment-background, hsl(var(--card))) !important;
+  border: 1px solid var(--velt-comment-border, hsl(var(--border))) !important;
+  border-radius: calc(var(--radius) - 2px) !important;
+}
+
+.velt-comment-composer textarea {
+  background: transparent !important;
+  color: var(--velt-comment-text, hsl(var(--foreground))) !important;
+  border: none !important;
+  font-family: inherit !important;
+}
+
+.velt-comment-composer textarea::placeholder {
+  color: hsl(var(--muted-foreground)) !important;
+}
+
+.velt-comment-pin {
+  background: hsl(var(--primary)) !important;
+  color: hsl(var(--primary-foreground)) !important;
+  border-radius: 50% !important;
+}
+
+.velt-comment-thread {
+  background: var(--velt-comment-background, hsl(var(--card))) !important;
+  border: 1px solid var(--velt-comment-border, hsl(var(--border))) !important;
+  border-radius: calc(var(--radius) - 2px) !important;
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1) !important;
+}
+
+/* Dark mode specific overrides */
+.dark .velt-comment-dialog,
+.dark .velt-comment-composer,
+.dark .velt-comment-thread {
+  background: hsl(var(--card)) !important;
+  color: hsl(var(--card-foreground)) !important;
+  border-color: hsl(var(--border)) !important;
+}
+
+/* Inline comments section styling */
+.velt-inline-comments-section {
+  margin-top: 1rem;
+  padding: 1rem;
+  background: hsl(var(--muted) / 0.3);
+  border-radius: calc(var(--radius) - 2px);
+  border: 1px dashed hsl(var(--border));
+}

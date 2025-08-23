@@ -1,6 +1,7 @@
 "use client"
 
 import dynamic from 'next/dynamic'
+import { useTheme } from '@/components/theme-provider'
 
 const VeltPresence = dynamic(
   () => import('@veltdev/react').then(mod => ({ default: mod.VeltPresence })),
@@ -11,9 +12,10 @@ const VeltPresence = dynamic(
 )
 
 function VeltPresenceWrapper() {
+  const { theme } = useTheme()
   return (
     <div className="flex items-center">
-      <VeltPresence />
+      <VeltPresence darkMode={theme === 'dark'} />
     </div>
   )
 }

@@ -12,6 +12,7 @@ import {
 import { useTheme } from "@/components/theme-provider"
 import { DynamicVeltPresence } from "./velt-presence-dynamic"
 import { DynamicVeltSidebarButton } from "./velt-comments-dynamic"
+import { DynamicVeltNotificationsTool } from "./velt-notifications-dynamic"
 import { getAvailableUsers } from "@/lib/user-manager"
 import { useEffect, useState } from "react"
 
@@ -59,6 +60,11 @@ export function Navbar({ currentUser, onUserSwitch, boardTitle }: NavbarProps) {
           {/* Velt Presence Component */}
           <div className="flex items-center mr-2 min-w-[80px]">
             <DynamicVeltPresence />
+          </div>
+
+          {/* Notifications */}
+          <div className="hidden sm:flex">
+            <DynamicVeltNotificationsTool />
           </div>
 
           {/* Comments Sidebar */}

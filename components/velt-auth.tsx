@@ -2,10 +2,12 @@
 
 import { useVeltClient } from '@veltdev/react'
 import { useEffect, useState, useRef } from 'react'
-import { getOrCreateUser } from '@/lib/user-manager'
+import { getOrCreateUser, getAvailableUsers } from '@/lib/user-manager'
+import { useTheme } from '@/components/theme-provider'
 
 export function VeltAuth() {
   const { client } = useVeltClient()
+  const { theme } = useTheme()
   const [userSwitchTrigger, setUserSwitchTrigger] = useState(0)
   const [isInitialized, setIsInitialized] = useState(false)
   const initializationRef = useRef(false)
@@ -35,6 +37,17 @@ export function VeltAuth() {
           documentName: 'Product Development Board'
         })
 
+        // Set up user contacts for mentions - only our two hardcoded users
+        const availableUsers = getAvailableUsers()
+        const userContacts = availableUsers.map(u => ({
+          userId: u.userId,
+          name: u.name,
+          email: u.email,
+          photoUrl: u.photoUrl
+        }))
+
+        await client.setUserContacts(userContacts)
+
         setIsInitialized(true)
       } catch (error) {
         console.error('Velt initialization error:', error)
@@ -46,6 +59,14 @@ export function VeltAuth() {
     setIsInitialized(false)
     initializeUser()
   }, [client, userSwitchTrigger])
+
+  // Handle theme changes
+  useEffect(() => {
+    if (!client || !isInitialized) return
+
+    // Set dark mode on the Velt client
+    client.setDarkMode(theme === 'dark')
+  }, [client, theme, isInitialized])
 
   // Listen for user switch events
   useEffect(() => {

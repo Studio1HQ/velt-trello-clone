@@ -1,6 +1,7 @@
 "use client"
 
 import dynamic from 'next/dynamic'
+import { useTheme } from '@/components/theme-provider'
 
 const VeltComments = dynamic(
   () => import('@veltdev/react').then(mod => ({ default: mod.VeltComments })),
@@ -27,15 +28,18 @@ const VeltSidebarButton = dynamic(
 )
 
 function VeltCommentsWrapper({ popoverMode = false }: { popoverMode?: boolean }) {
-  return <VeltComments popoverMode={popoverMode} />
+  const { theme } = useTheme()
+  return <VeltComments popoverMode={popoverMode} darkMode={theme === 'dark'} />
 }
 
 function VeltCommentsSidebarWrapper() {
-  return <VeltCommentsSidebar />
+  const { theme } = useTheme()
+  return <VeltCommentsSidebar darkMode={theme === 'dark'} />
 }
 
 function VeltSidebarButtonWrapper() {
-  return <VeltSidebarButton />
+  const { theme } = useTheme()
+  return <VeltSidebarButton darkMode={theme === 'dark'} />
 }
 
 export { 
