@@ -6,8 +6,6 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardHeader } from "@/components/ui/card"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
 import { Badge } from "@/components/ui/badge"
-import { Textarea } from "@/components/ui/textarea"
-import { ScrollArea } from "@/components/ui/scroll-area"
 import { DynamicVeltInlineCommentsSection } from "@/components/velt-inline-comments-dynamic"
 import { useTheme } from "@/components/theme-provider"
 import { BoardCard } from "@/hooks/use-live-board-sync"
@@ -20,27 +18,12 @@ interface User {
   online: boolean
 }
 
-interface Reaction {
-  emoji: string
-  count: number
-  users: string[]
-}
 
 
-interface Comment {
-  id: string
-  cardId: string
-  userId: string
-  text: string
-  timestamp: string
-  reactions: Reaction[]
-}
 
 interface CardDetailModalProps {
   card: BoardCard
-  comments: Comment[]
   users: User[]
-  currentUser: User
   onClose: () => void
 }
 
@@ -80,22 +63,15 @@ function formatRelativeTime(timestamp: string): string {
 
 const reactionEmojis = ["👍", "❤️", "😂", "😮", "😢", "😡", "🎉", "🔥", "💡", "✅"]
 
-export function CardDetailModal({ card, comments, users, currentUser, onClose }: CardDetailModalProps) {
-  const [newComment, setNewComment] = useState("")
+export function CardDetailModal({ card, users, onClose }: CardDetailModalProps) {
   const [showReactionPicker, setShowReactionPicker] = useState<string | null>(null)
   const { theme } = useTheme()
 
   const getUserById = (id: string) => users.find((user) => user.id === id)
   const creator = getUserById(card.createdBy)
   const cardContainerId = `card-detail-${card.id}`
+  const cardTargetId = `card-${card.id}`
 
-  const handleAddComment = () => {
-    if (newComment.trim()) {
-      // In a real app, this would make an API call
-      console.log("Adding comment:", newComment)
-      setNewComment("")
-    }
-  }
 
   const handleReactionClick = (emoji: string, targetId: string, targetType: "card" | "comment") => {
     // In a real app, this would make an API call
@@ -110,14 +86,14 @@ export function CardDetailModal({ card, comments, users, currentUser, onClose }:
           <div className="flex-1 min-w-0">
             <section 
               id={cardContainerId}
-              data-velt-target-inline-comment-element-id={cardContainerId}
+              data-velt-target-inline-comment-element-id={cardTargetId}
             >
               <h2 className="text-lg font-semibold text-foreground mb-2 pr-8">{card.title}</h2>
               <div className="flex items-center gap-4 text-sm text-muted-foreground">
                 {creator && (
                   <div className="flex items-center gap-2">
                     <Avatar className="h-6 w-6">
-                      <AvatarImage src={creator.avatar || "/placeholder.svg"} alt={creator.name} />
+                      <AvatarImage src={creator.avatar} alt={creator.name} />
                       <AvatarFallback className="text-xs">
                         {creator.name
                           .split(" ")
@@ -150,7 +126,7 @@ export function CardDetailModal({ card, comments, users, currentUser, onClose }:
                   const user = getUserById(userId)
                   return user ? (
                     <Avatar key={userId} className="h-8 w-8 border-2 border-background">
-                      <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
+                      <AvatarImage src={user.avatar} alt={user.name} />
                       <AvatarFallback className="text-xs">
                         {user.name
                           .split(" ")
@@ -215,7 +191,7 @@ export function CardDetailModal({ card, comments, users, currentUser, onClose }:
             </div>
             
             <DynamicVeltInlineCommentsSection
-              targetElementId={cardContainerId}
+              targetElementId={cardTargetId}
               darkMode={theme === 'dark'}
             />
           </div>

@@ -41,6 +41,22 @@ interface BoardData {
   lists: List[]
 }
 
+// Static list of label background classes so Tailwind JIT picks them up.
+// Keep these literal class names here (they are intentionally repeated)
+// to avoid runtime-only class names that Tailwind might purge.
+const LABEL_BG_CLASSES: Record<string, string> = {
+  "bg-green-500": "bg-green-500",
+  "bg-blue-500": "bg-blue-500",
+  "bg-red-500": "bg-red-500",
+  "bg-purple-500": "bg-purple-500",
+  "bg-yellow-500": "bg-yellow-500",
+  "bg-pink-500": "bg-pink-500",
+  "bg-indigo-500": "bg-indigo-500",
+  "bg-gray-500": "bg-gray-500",
+  "bg-orange-500": "bg-orange-500",
+  "bg-teal-500": "bg-teal-500",
+}
+
 // Update the BoardProps interface to include onDeleteCard
 interface BoardProps {
   board: BoardData
@@ -160,76 +176,77 @@ function DraggableCard({
           </DropdownMenu>
         </div>
 
-        <h4 className="text-sm font-medium mb-3 text-foreground leading-relaxed pr-6">{card.title}</h4>
-
-        {/* Card Metadata */}
-        <div className="flex items-center justify-between mb-3 text-xs text-muted-foreground">
-          <div className="flex items-center gap-2">
-            {creator && (
-              <div className="flex items-center gap-1">
-                <span className="truncate max-w-[80px]">{creator.name.split(" ")[0]}</span>
-              </div>
-            )}
-          </div>
-          <div className="flex items-center gap-1 flex-shrink-0">
-            <Clock className="h-3 w-3" />
-            <span>{formatRelativeTime(card.createdAt)}</span>
-          </div>
-        </div>
-
-        {/* Assigned Users */}
-        {card.assignedUsers.length > 0 && (
-          <div className="flex -space-x-2 mb-3">
-            {card.assignedUsers.slice(0, 4).map((userId) => {
-              const user = getUserById(userId)
-              return user ? (
-                <Avatar key={userId} className="h-6 w-6 border-2 border-background">
-                  <AvatarImage src={user.avatar || "/placeholder.svg"} alt={user.name} />
-                  <AvatarFallback className="text-xs">
-                    {user.name
-                      .split(" ")
-                      .map((n) => n[0])
-                      .join("")}
-                  </AvatarFallback>
-                </Avatar>
-              ) : null
+        {/* Labels */}
+        {card.labels && card.labels.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-2">
+            {card.labels.map((label, index) => {
+              // Use a static mapping so Tailwind includes the bg classes.
+              const bgClass = LABEL_BG_CLASSES[label.color] ?? label.color
+              return (
+                <Badge key={index} className={`${bgClass} text-white hover:opacity-80`}>
+                  {label.name}
+                </Badge>
+              )
             })}
-            {card.assignedUsers.length > 4 && (
-              <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted border-2 border-background text-xs font-medium">
-                +{card.assignedUsers.length - 4}
-              </div>
-            )}
           </div>
         )}
 
-        {/* Reactions and Comments */}
-        <div className="flex items-center justify-between flex-wrap gap-2">
-          {/* Reactions */}
-          {card.reactions.length > 0 && (
-            <div className="flex flex-wrap gap-1" data-velt-reactions={`card-${card.id}`}>
-              {card.reactions.map((reaction, index) => (
-                <Badge
-                  key={index}
-                  variant="secondary"
-                  className="text-xs px-2 py-0.5 cursor-pointer hover:bg-accent"
-                  data-velt-reaction={reaction.emoji}
-                >
-                  {reaction.emoji} {reaction.count}
-                </Badge>
-              ))}
-            </div>
-          )}
+        <h4 className="text-sm font-medium mb-2 text-foreground leading-relaxed pr-6">{card.title}</h4>
+        
+        {/* Description */}
+        {card.description && (
+          <p className="text-xs text-muted-foreground mb-3 line-clamp-2 leading-relaxed">{card.description}</p>
+        )}
 
-          {/* Comment Count */}
-          {card.commentCount > 0 && (
-            <Badge
-              variant="outline"
-              className="text-xs ml-auto flex-shrink-0"
-              data-velt-comment-count={`card-${card.id}`}
-            >
-              💬 {card.commentCount}
-            </Badge>
-          )}
+        {/* Reactions */}
+        {card.reactions.length > 0 && (
+          <div className="flex flex-wrap gap-1 mb-3" data-velt-reactions={`card-${card.id}`}>
+            {card.reactions.map((reaction, index) => (
+              <Badge
+                key={index}
+                variant="secondary"
+                className="text-xs px-2 py-0.5 cursor-pointer hover:bg-accent"
+                data-velt-reaction={reaction.emoji}
+              >
+                {reaction.emoji} {reaction.count}
+              </Badge>
+            ))}
+          </div>
+        )}
+
+        {/* Bottom section with avatar, time, and comments */}
+        <div className="flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            {/* Assigned User Avatar */}
+            {card.assignedUsers.length > 0 && (
+              <div className="flex -space-x-1">
+                {card.assignedUsers.slice(0, 2).map((userId) => {
+                  const user = getUserById(userId)
+                  return user ? (
+                    <Avatar key={userId} className="h-6 w-6 border-2 border-background">
+                      <AvatarImage src={user.avatar} alt={user.name} />
+                      <AvatarFallback className="text-xs">
+                        {user.name
+                          .split(" ")
+                          .map((n) => n[0])
+                          .join("")}
+                      </AvatarFallback>
+                    </Avatar>
+                  ) : null
+                })}
+                {card.assignedUsers.length > 2 && (
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full bg-muted border-2 border-background text-xs font-medium">
+                    +{card.assignedUsers.length - 2}
+                  </div>
+                )}
+              </div>
+            )}
+
+            <div className="flex items-center gap-1 text-xs text-muted-foreground">
+              <Clock className="h-3 w-3" />
+              <span>{formatRelativeTime(card.createdAt)}</span>
+            </div>
+          </div>
         </div>
       </CardContent>
     </Card>

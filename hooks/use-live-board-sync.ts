@@ -6,11 +6,13 @@ import { useSetLiveStateData, useLiveStateData } from '@veltdev/react'
 export type BoardCard = {
   id: string
   title: string
+  description?: string
   assignedUsers: string[]
   reactions: { emoji: string; count: number; users: string[] }[]
   commentCount: number
   createdBy: string
   createdAt: string
+  labels?: { color: string; name: string }[]
 }
 
 export type List = {
@@ -38,23 +40,32 @@ const initialBoardData: BoardData = {
         {
           id: "card-1",
           title: "Design new landing page",
-          assignedUsers: ["1", "2"],
+          description: "Create a modern, responsive landing page that showcases our product features and converts visitors into users.",
+          assignedUsers: ["user_bob_smith"],
           reactions: [
-            { emoji: "👍", count: 3, users: ["1", "2", "3"] },
-            { emoji: "❤️", count: 1, users: ["1"] },
+            { emoji: "👍", count: 3, users: ["user_alice_johnson", "user_bob_smith"] },
+            { emoji: "❤️", count: 1, users: ["user_alice_johnson"] },
           ],
-          commentCount: 5,
-          createdBy: "1",
+          commentCount: 0,
+          createdBy: "user_alice_johnson",
           createdAt: "2024-01-14T10:30:00Z",
+          labels: [
+            { color: "bg-green-500", name: "Design" },
+            { color: "bg-blue-500", name: "Frontend" }
+          ]
         },
         {
           id: "card-2",
           title: "Research user feedback",
-          assignedUsers: ["3"],
-          reactions: [{ emoji: "🎉", count: 2, users: ["2", "4"] }],
-          commentCount: 2,
-          createdBy: "3",
+          description: "Analyze customer surveys and interviews to identify pain points and improvement opportunities.",
+          assignedUsers: ["user_alice_johnson"],
+          reactions: [{ emoji: "🎉", count: 2, users: ["user_bob_smith"] }],
+          commentCount: 0,
+          createdBy: "user_bob_smith",
           createdAt: "2024-01-15T14:20:00Z",
+          labels: [
+            { color: "bg-purple-500", name: "Research" }
+          ]
         },
       ],
     },
@@ -65,14 +76,19 @@ const initialBoardData: BoardData = {
         {
           id: "card-3",
           title: "Implement authentication system",
-          assignedUsers: ["2", "4"],
+          description: "Build secure user authentication with JWT tokens, password reset functionality, and social login options.",
+          assignedUsers: ["user_alice_johnson"],
           reactions: [
-            { emoji: "👍", count: 1, users: ["1"] },
-            { emoji: "🔥", count: 2, users: ["2", "3"] },
+            { emoji: "👍", count: 1, users: ["user_alice_johnson"] },
+            { emoji: "🔥", count: 2, users: ["user_bob_smith"] },
           ],
-          commentCount: 8,
-          createdBy: "2",
+          commentCount: 0,
+          createdBy: "user_bob_smith",
           createdAt: "2024-01-13T09:15:00Z",
+          labels: [
+            { color: "bg-red-500", name: "Backend" },
+            { color: "bg-yellow-500", name: "Security" }
+          ]
         },
       ],
     },
@@ -83,11 +99,15 @@ const initialBoardData: BoardData = {
         {
           id: "card-4",
           title: "Set up project repository",
-          assignedUsers: ["1"],
-          reactions: [{ emoji: "✅", count: 4, users: ["1", "2", "3", "4"] }],
-          commentCount: 3,
-          createdBy: "1",
+          description: "Initialize Git repository, set up CI/CD pipeline, configure development environment and documentation.",
+          assignedUsers: ["user_bob_smith"],
+          reactions: [{ emoji: "✅", count: 4, users: ["user_alice_johnson", "user_bob_smith"] }],
+          commentCount: 0,
+          createdBy: "user_alice_johnson",
           createdAt: "2024-01-12T16:45:00Z",
+          labels: [
+            { color: "bg-gray-500", name: "DevOps" }
+          ]
         },
       ],
     },
@@ -136,16 +156,59 @@ export function useLiveBoardSync() {
     })
   }, [])
 
+  // Random descriptions with emojis
+  const getRandomDescription = () => {
+    const descriptions = [
+      "🚀 Let's tackle this challenge with enthusiasm and creativity!",
+      "💡 This task requires innovative thinking and careful planning.",
+      "🎯 Focus on delivering high-quality results that exceed expectations.",
+      "⚡ Time to bring our A-game and make this happen efficiently.",
+      "🔥 This is going to be an exciting feature to work on!",
+      "🌟 Another opportunity to showcase our amazing skills.",
+      "🎨 Let's create something beautiful and functional.",
+      "⚙️ Technical excellence is the goal for this implementation.",
+      "🏆 Ready to deliver outstanding results on this task.",
+      "💪 Challenging but definitely achievable with the right approach."
+    ]
+    return descriptions[Math.floor(Math.random() * descriptions.length)]
+  }
+
+  // Random labels
+  const getRandomLabels = () => {
+    const allLabels = [
+      { color: "bg-green-500", name: "Feature" },
+      { color: "bg-blue-500", name: "Frontend" },
+      { color: "bg-red-500", name: "Backend" },
+      { color: "bg-purple-500", name: "Research" },
+      { color: "bg-yellow-500", name: "Bug Fix" },
+      { color: "bg-pink-500", name: "UI/UX" },
+      { color: "bg-indigo-500", name: "API" },
+      { color: "bg-gray-500", name: "DevOps" },
+      { color: "bg-orange-500", name: "Testing" },
+      { color: "bg-teal-500", name: "Documentation" }
+    ]
+    
+    // Return 1-2 random labels
+    const numLabels = Math.floor(Math.random() * 2) + 1
+    const shuffled = allLabels.sort(() => 0.5 - Math.random())
+    return shuffled.slice(0, numLabels)
+  }
+
   // Card operations
   const addCard = useCallback((listId: string, title: string, currentUser: any) => {
+    // Assign to the other user (if current user is Alice, assign to Bob and vice versa)
+    const otherUserId = currentUser?.userId === 'user_alice_johnson' ? 'user_bob_smith' : 'user_alice_johnson'
+    
     const newCard: BoardCard = {
-      id: `card-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `card-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
       title,
-      assignedUsers: [currentUser?.userId || '1'],
+      description: getRandomDescription(),
+      assignedUsers: [otherUserId],
       reactions: [],
       commentCount: 0,
-      createdBy: currentUser?.userId || '1',
+      createdBy: currentUser?.userId || 'user_alice_johnson',
       createdAt: new Date().toISOString(),
+      labels: getRandomLabels()
     }
 
     updateBoardData(prev => ({
@@ -203,7 +266,7 @@ export function useLiveBoardSync() {
 
   const addList = useCallback((title: string) => {
     const newList: List = {
-      id: `list-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`,
+      id: `list-${Date.now()}-${Math.random().toString(36).substring(2, 11)}`,
       title,
       cards: []
     }

@@ -20,62 +20,25 @@ import {
 } from "@dnd-kit/core"
 import { Card, CardContent } from "@/components/ui/card"
 
-// Mock data
+// Mock data - matching Velt user system
 const mockUsers = [
   {
-    id: "1",
+    id: "user_alice_johnson",
     name: "Alice Johnson",
-    avatar: "/placeholder.svg?height=32&width=32",
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=user_alice_johnson",
     email: "alice@example.com",
     online: true,
   },
-  { id: "2", name: "Bob Smith", avatar: "/placeholder.svg?height=32&width=32", email: "bob@example.com", online: true },
-  {
-    id: "3",
-    name: "Carol Davis",
-    avatar: "/placeholder.svg?height=32&width=32",
-    email: "carol@example.com",
-    online: false,
-  },
-  {
-    id: "4",
-    name: "David Wilson",
-    avatar: "/placeholder.svg?height=32&width=32",
-    email: "david@example.com",
-    online: true,
+  { 
+    id: "user_bob_smith", 
+    name: "Bob Smith", 
+    avatar: "https://api.dicebear.com/7.x/avataaars/svg?seed=user_bob_smith", 
+    email: "bob@example.com", 
+    online: true 
   },
 ]
 
 
-const mockComments = [
-  {
-    id: "comment-1",
-    cardId: "card-1",
-    userId: "1",
-    text: "I think we should focus on mobile-first design for this landing page.",
-    timestamp: "2024-01-15T10:30:00Z",
-    reactions: [
-      { emoji: "👍", count: 2, users: ["2", "3"] },
-      { emoji: "💡", count: 1, users: ["2"] },
-    ],
-  },
-  {
-    id: "comment-2",
-    cardId: "card-1",
-    userId: "2",
-    text: "Agreed! I'll start with the wireframes this week.",
-    timestamp: "2024-01-15T11:15:00Z",
-    reactions: [],
-  },
-  {
-    id: "comment-3",
-    cardId: "card-1",
-    userId: "3",
-    text: "Don't forget to include the new brand colors we discussed.",
-    timestamp: "2024-01-15T14:20:00Z",
-    reactions: [{ emoji: "🎨", count: 1, users: ["1"] }],
-  },
-]
 
 export default function Home() {
   const { boardData, isInitialized, addCard, deleteCard, moveCard, addList } = useLiveBoardSync()
@@ -114,8 +77,6 @@ export default function Home() {
   const selectedCardData = selectedCard
     ? boardData.lists.flatMap((list) => list.cards).find((card) => card.id === selectedCard)
     : null
-
-  const selectedCardComments = selectedCard ? mockComments.filter((comment) => comment.cardId === selectedCard) : []
 
   const handleDragStart = (event: DragStartEvent) => {
     const { active } = event
@@ -195,9 +156,7 @@ export default function Home() {
         {selectedCard && selectedCardData && (
           <CardDetailModal
             card={selectedCardData}
-            comments={selectedCardComments}
             users={mockUsers}
-            currentUser={currentUser}
             onClose={handleCloseCardDetail}
           />
         )}
