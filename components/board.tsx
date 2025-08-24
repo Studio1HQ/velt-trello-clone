@@ -13,6 +13,7 @@ import { Badge } from "@/components/ui/badge"
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
 import { AddCardForm } from "@/components/add-card-form"
 import { AddListForm } from "@/components/add-list-form"
+import { BoardCard } from "@/hooks/use-live-board-sync"
 
 interface BoardUser {
   id: string
@@ -26,16 +27,6 @@ interface Reaction {
   emoji: string
   count: number
   users: string[]
-}
-
-interface BoardCard {
-  id: string
-  title: string
-  assignedUsers: string[]
-  reactions: Reaction[]
-  commentCount: number
-  createdBy: string
-  createdAt: string
 }
 
 interface List {

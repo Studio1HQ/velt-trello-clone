@@ -10,6 +10,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { DynamicVeltInlineCommentsSection } from "@/components/velt-inline-comments-dynamic"
 import { useTheme } from "@/components/theme-provider"
+import { BoardCard } from "@/hooks/use-live-board-sync"
 
 interface User {
   id: string
@@ -25,15 +26,6 @@ interface Reaction {
   users: string[]
 }
 
-interface BoardCard {
-  id: string
-  title: string
-  assignedUsers: string[]
-  reactions: Reaction[]
-  commentCount: number
-  createdBy: string
-  createdAt: string
-}
 
 interface Comment {
   id: string

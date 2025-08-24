@@ -8,6 +8,7 @@ import { ThemeProvider } from "@/components/theme-provider"
 import { VeltAuth } from "@/components/velt-auth"
 import { DynamicVeltComments, DynamicVeltCommentsSidebar } from "@/components/velt-comments-dynamic"
 import { getOrCreateUser, switchUser } from "@/lib/user-manager"
+import { useLiveBoardSync, type BoardCard } from "@/hooks/use-live-board-sync"
 import {
   DndContext,
   type DragEndEvent,
@@ -45,84 +46,6 @@ const mockUsers = [
   },
 ]
 
-// Update the BoardCard type to include creator and timestamp
-type BoardCard = {
-  id: string
-  title: string
-  assignedUsers: string[]
-  reactions: { emoji: string; count: number; users: string[] }[]
-  commentCount: number
-  createdBy: string
-  createdAt: string
-}
-
-// Update the mock board data to include creator and timestamp information
-const mockBoard = {
-  id: "board-1",
-  title: "Product Development Board",
-  lists: [
-    {
-      id: "list-1",
-      title: "To Do",
-      cards: [
-        {
-          id: "card-1",
-          title: "Design new landing page",
-          assignedUsers: ["1", "2"],
-          reactions: [
-            { emoji: "👍", count: 3, users: ["1", "2", "3"] },
-            { emoji: "❤️", count: 1, users: ["1"] },
-          ],
-          commentCount: 5,
-          createdBy: "1",
-          createdAt: "2024-01-14T10:30:00Z",
-        },
-        {
-          id: "card-2",
-          title: "Research user feedback",
-          assignedUsers: ["3"],
-          reactions: [{ emoji: "🎉", count: 2, users: ["2", "4"] }],
-          commentCount: 2,
-          createdBy: "3",
-          createdAt: "2024-01-15T14:20:00Z",
-        },
-      ],
-    },
-    {
-      id: "list-2",
-      title: "In Progress",
-      cards: [
-        {
-          id: "card-3",
-          title: "Implement authentication system",
-          assignedUsers: ["2", "4"],
-          reactions: [
-            { emoji: "👍", count: 1, users: ["1"] },
-            { emoji: "🔥", count: 2, users: ["2", "3"] },
-          ],
-          commentCount: 8,
-          createdBy: "2",
-          createdAt: "2024-01-13T09:15:00Z",
-        },
-      ],
-    },
-    {
-      id: "list-3",
-      title: "Done",
-      cards: [
-        {
-          id: "card-4",
-          title: "Set up project repository",
-          assignedUsers: ["1"],
-          reactions: [{ emoji: "✅", count: 4, users: ["1", "2", "3", "4"] }],
-          commentCount: 3,
-          createdBy: "1",
-          createdAt: "2024-01-12T16:45:00Z",
-        },
-      ],
-    },
-  ],
-}
 
 const mockComments = [
   {
@@ -155,7 +78,7 @@ const mockComments = [
 ]
 
 export default function Home() {
-  const [boardData, setBoardData] = useState(mockBoard)
+  const { boardData, isInitialized, addCard, deleteCard, moveCard, addList } = useLiveBoardSync()
   const [activeCard, setActiveCard] = useState<BoardCard | null>(null)
   const [currentUser, setCurrentUser] = useState<any>(null)
   const [selectedCard, setSelectedCard] = useState<string | null>(null)
@@ -209,78 +132,31 @@ export default function Home() {
     const activeCardId = active.id as string
     const overListId = over.id as string
 
-    setBoardData((prev) => {
-      const newBoard = { ...prev }
-      let sourceListIndex = -1
-      let sourceCardIndex = -1
-      let sourceCard: BoardCard | null = null
-
-      // Find source card and list
-      for (let i = 0; i < newBoard.lists.length; i++) {
-        const cardIndex = newBoard.lists[i].cards.findIndex((card) => card.id === activeCardId)
-        if (cardIndex !== -1) {
-          sourceListIndex = i
-          sourceCardIndex = cardIndex
-          sourceCard = newBoard.lists[i].cards[cardIndex]
-          break
-        }
-      }
-
-      if (!sourceCard || sourceListIndex === -1) return prev
-
-      // Remove card from source list
-      newBoard.lists[sourceListIndex].cards.splice(sourceCardIndex, 1)
-
-      // Add card to target list
-      const targetListIndex = newBoard.lists.findIndex((list) => list.id === overListId)
-      if (targetListIndex !== -1) {
-        newBoard.lists[targetListIndex].cards.push(sourceCard)
-      }
-
-      return newBoard
-    })
+    // Use the live sync move card function
+    moveCard(activeCardId, overListId)
   }
 
-  // Update the handleAddCard function to include creator and timestamp
   const handleAddCard = (listId: string, title: string) => {
-    const newCard: BoardCard = {
-      id: `card-${Date.now()}`,
-      title,
-      assignedUsers: [currentUser?.userId || '1'],
-      reactions: [],
-      commentCount: 0,
-      createdBy: currentUser?.userId || '1',
-      createdAt: new Date().toISOString(),
-    }
-
-    setBoardData((prev) => ({
-      ...prev,
-      lists: prev.lists.map((list) => (list.id === listId ? { ...list, cards: [...list.cards, newCard] } : list)),
-    }))
+    addCard(listId, title, currentUser)
   }
 
   const handleDeleteCard = (cardId: string) => {
-    setBoardData((prev) => ({
-      ...prev,
-      lists: prev.lists.map((list) => ({
-        ...list,
-        cards: list.cards.filter((card) => card.id !== cardId),
-      })),
-    }))
+    deleteCard(cardId)
   }
 
-  // Add handleAddList function
   const handleAddList = (title: string) => {
-    const newList = {
-      id: `list-${Date.now()}`,
-      title,
-      cards: [],
-    }
+    addList(title)
+  }
 
-    setBoardData((prev) => ({
-      ...prev,
-      lists: [...prev.lists, newList],
-    }))
+  // Don't render until live sync is initialized
+  if (!isInitialized) {
+    return (
+      <ThemeProvider>
+        <div className="min-h-screen bg-background flex items-center justify-center">
+          <div className="text-muted-foreground">Loading...</div>
+        </div>
+      </ThemeProvider>
+    )
   }
 
   return (
