@@ -1,30 +1,6 @@
-# Trello-style board design
+## v0.dev trello board design screenshots
 
-*Automatically synced with your [v0.dev](https://v0.dev) deployments*
-
-[![Deployed on Vercel](https://img.shields.io/badge/Deployed%20on-Vercel-black?style=for-the-badge&logo=vercel)](https://vercel.com/harshalranjhanis-projects/v0-trello-style-board-design)
-[![Built with v0](https://img.shields.io/badge/Built%20with-v0.dev-black?style=for-the-badge)](https://v0.dev/chat/projects/PeI0ShfEuOG)
-
-## Overview
-
-This repository will stay in sync with your deployed chats on [v0.dev](https://v0.dev).
-Any changes you make to your deployed app will be automatically pushed to this repository from [v0.dev](https://v0.dev).
-
-## Deployment
-
-Your project is live at:
-
-**[https://vercel.com/harshalranjhanis-projects/v0-trello-style-board-design](https://vercel.com/harshalranjhanis-projects/v0-trello-style-board-design)**
-
-## Build your app
-
-Continue building your app on:
-
-**[https://v0.dev/chat/projects/PeI0ShfEuOG](https://v0.dev/chat/projects/PeI0ShfEuOG)**
-
-## How It Works
-
-1. Create and modify your project using [v0.dev](https://v0.dev)
-2. Deploy your chats from the v0 interface
-3. Changes are automatically pushed to this repository
-4. Vercel deploys the latest version from this repository
+<img width="3840" height="2160" alt="SCR-20250708-owuq" src="https://github.com/user-attachments/assets/f51ad005-649c-4f84-af74-6737cfd19e4f" />
+<img width="3840" height="2160" alt="SCR-20250708-oxni" src="https://github.com/user-attachments/assets/d3d45dc9-fa4a-4e4f-bdf1-1d6401381b51" />
+<img width="3840" height="2160" alt="SCR-20250708-oyjq" src="https://github.com/user-attachments/assets/0f6b8234-7940-4361-b90f-bc05b04c522c" />
+<img width="3840" height="2160" alt="SCR-20250708-ozxr" src="https://github.com/user-attachments/assets/43f98c1e-d2df-451b-b4b2-b1443b99f201" />
