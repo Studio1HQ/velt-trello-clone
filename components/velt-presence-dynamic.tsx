@@ -12,10 +12,10 @@ const VeltPresence = dynamic(
 )
 
 function VeltPresenceWrapper() {
-  const { theme } = useTheme()
+  const { resolvedTheme } = useTheme()
   return (
     <div className="flex items-center">
-      <VeltPresence darkMode={theme === 'dark'} />
+      <VeltPresence darkMode={resolvedTheme === 'dark'} />
     </div>
   )
 }

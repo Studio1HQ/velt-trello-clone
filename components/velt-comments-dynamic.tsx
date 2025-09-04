@@ -28,18 +28,18 @@ const VeltSidebarButton = dynamic(
 )
 
 function VeltCommentsWrapper({ popoverMode = false }: { popoverMode?: boolean }) {
-  const { theme } = useTheme()
-  return <VeltComments popoverMode={popoverMode} darkMode={theme === 'dark'} />
+  const { resolvedTheme } = useTheme()
+  return <VeltComments popoverMode={popoverMode} darkMode={resolvedTheme === 'dark'} />
 }
 
 function VeltCommentsSidebarWrapper() {
-  const { theme } = useTheme()
-  return <VeltCommentsSidebar darkMode={theme === 'dark'} />
+  const { resolvedTheme } = useTheme()
+  return <VeltCommentsSidebar darkMode={resolvedTheme === 'dark'} />
 }
 
 function VeltSidebarButtonWrapper() {
-  const { theme } = useTheme()
-  return <VeltSidebarButton darkMode={theme === 'dark'} />
+  const { resolvedTheme } = useTheme()
+  return <VeltSidebarButton darkMode={resolvedTheme === 'dark'} />
 }
 
 export { 
