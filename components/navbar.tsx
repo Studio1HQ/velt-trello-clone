@@ -56,25 +56,25 @@ export function Navbar({ currentUser, onUserSwitch, boardTitle }: NavbarProps) {
         </div>
 
         {/* Right section - Presence, Theme, User */}
-        <div className="flex items-center gap-1 sm:gap-4">
+        <div className="flex items-center gap-4">
           {/* Velt Presence Component */}
-          <div className="flex items-center mr-2 min-w-[80px]">
+          <div className="flex items-center justify-center h-9">
             <DynamicVeltPresence />
           </div>
 
           {/* Notifications */}
-          <div className="hidden sm:flex">
+          <div className="hidden sm:flex items-center justify-center h-9 w-9">
             <DynamicVeltNotificationsTool />
           </div>
 
           {/* Comments Sidebar */}
-          <div className="hidden sm:flex">
+          <div className="hidden sm:flex items-center justify-center h-9 w-9">
             <DynamicVeltSidebarButton />
           </div>
 
           {/* Theme Toggle */}
-          <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-8 w-8 sm:h-9 sm:w-9">
-            {theme === "dark" ? <Sun className="h-3 w-3 sm:h-4 sm:w-4" /> : <Moon className="h-3 w-3 sm:h-4 sm:w-4" />}
+          <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9">
+            {theme === "dark" ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             <span className="sr-only">Toggle theme</span>
           </Button>
 

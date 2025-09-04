@@ -7,14 +7,14 @@ const VeltPresence = dynamic(
   () => import('@veltdev/react').then(mod => ({ default: mod.VeltPresence })),
   {
     ssr: false,
-    loading: () => <div className="h-8 w-20 bg-muted animate-pulse rounded-full" />
+    loading: () => <div className="h-6 w-16 bg-muted animate-pulse rounded-full" />
   }
 )
 
 function VeltPresenceWrapper() {
   const { resolvedTheme } = useTheme()
   return (
-    <div className="flex items-center">
+    <div className="flex items-center justify-center">
       <VeltPresence darkMode={resolvedTheme === 'dark'} />
     </div>
   )
