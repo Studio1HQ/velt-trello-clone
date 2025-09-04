@@ -4,3 +4,15 @@
 <img width="3840" height="2160" alt="SCR-20250708-oxni" src="https://github.com/user-attachments/assets/d3d45dc9-fa4a-4e4f-bdf1-1d6401381b51" />
 <img width="3840" height="2160" alt="SCR-20250708-oyjq" src="https://github.com/user-attachments/assets/0f6b8234-7940-4361-b90f-bc05b04c522c" />
 <img width="3840" height="2160" alt="SCR-20250708-ozxr" src="https://github.com/user-attachments/assets/43f98c1e-d2df-451b-b4b2-b1443b99f201" />
+
+## Tech stack
+
+- Next.js framework
+- v0.dev for vibe coded UI
+
+## Velt Features
+
+- Comments
+- Presence
+- Live Data Sync
+- Notifications
